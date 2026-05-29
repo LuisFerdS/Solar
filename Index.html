@@ -1,0 +1,693 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+    <title>SolarWise · Eficiencia Real de Panel Solar | Diseño Apple</title>
+    <!-- Leaflet CSS/JS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: radial-gradient(circle at 20% 30%, #e8eef5, #d0d9e8);
+            font-family: -apple-system, 'SF Pro Display', 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+            padding: 32px;
+            min-height: 100vh;
+        }
+
+        /* Glassmorphism principal */
+        .glass-card {
+            max-width: 1300px;
+            margin: 0 auto;
+            background: rgba(255, 255, 255, 0.75);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border-radius: 48px;
+            box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25), inset 0 1px 0 rgba(255,255,255,0.6);
+            overflow: hidden;
+            border: 0.5px solid rgba(255,255,255,0.4);
+        }
+
+        /* Header estilo iOS */
+        .hero-glass {
+            background: linear-gradient(135deg, rgba(30,60,114,0.9), rgba(15,42,74,0.95));
+            backdrop-filter: blur(10px);
+            padding: 1.5rem 2rem;
+            color: white;
+            border-bottom: 0.5px solid rgba(255,255,255,0.2);
+        }
+
+        .hero-glass h1 {
+            font-size: 1.6rem;
+            font-weight: 600;
+            letter-spacing: -0.3px;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            flex-wrap: wrap;
+        }
+
+        .badge-glass {
+            background: rgba(255,255,255,0.2);
+            backdrop-filter: blur(8px);
+            font-size: 0.7rem;
+            font-weight: 500;
+            padding: 4px 14px;
+            border-radius: 40px;
+            letter-spacing: 0.3px;
+        }
+
+        .hero-glass p {
+            font-size: 0.8rem;
+            opacity: 0.85;
+            margin-top: 8px;
+            font-weight: 400;
+        }
+
+        /* Grid principal */
+        .main-grid {
+            display: grid;
+            grid-template-columns: 1fr 1.2fr;
+            gap: 20px;
+            padding: 24px;
+        }
+
+        @media (max-width: 900px) {
+            body { padding: 16px; }
+            .main-grid { grid-template-columns: 1fr; gap: 16px; padding: 20px; }
+        }
+
+        /* Tarjetas glassmorphism */
+        .glass-panel {
+            background: rgba(255, 255, 255, 0.7);
+            backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-radius: 28px;
+            border: 0.5px solid rgba(255,255,255,0.6);
+            box-shadow: 0 8px 20px rgba(0,0,0,0.08);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .panel-header {
+            padding: 16px 20px;
+            background: rgba(255,255,255,0.5);
+            border-bottom: 0.5px solid rgba(0,0,0,0.05);
+            font-weight: 600;
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            color: #1e3c72;
+        }
+
+        .panel-body {
+            padding: 18px;
+        }
+
+        /* Mapa */
+        .map-container {
+            height: 260px;
+            width: 100%;
+            border-radius: 24px;
+            overflow: hidden;
+            margin-bottom: 12px;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.1);
+        }
+        .map-buttons {
+            display: flex;
+            gap: 10px;
+            justify-content: center;
+        }
+        .btn-soft {
+            background: rgba(255,255,255,0.85);
+            backdrop-filter: blur(8px);
+            border: 0.5px solid rgba(0,0,0,0.1);
+            padding: 8px 18px;
+            border-radius: 40px;
+            font-size: 0.7rem;
+            font-weight: 500;
+            color: #1e3c72;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .btn-soft:hover {
+            background: white;
+            transform: scale(0.96);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+
+        /* Campos de entrada estilo iOS */
+        .coord-group {
+            display: flex;
+            gap: 14px;
+            margin-bottom: 16px;
+        }
+        .coord-input {
+            flex: 1;
+        }
+        .coord-input label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #5e6f8d;
+            text-transform: uppercase;
+            margin-bottom: 6px;
+            display: block;
+        }
+        .coord-input input {
+            width: 100%;
+            padding: 12px 14px;
+            background: rgba(255,255,255,0.8);
+            border: 0.5px solid rgba(0,0,0,0.1);
+            border-radius: 28px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            backdrop-filter: blur(4px);
+            transition: all 0.2s;
+        }
+        .coord-input input:focus {
+            outline: none;
+            border-color: #F97316;
+            background: white;
+            box-shadow: 0 0 0 3px rgba(249,115,22,0.2);
+        }
+
+        /* Nuevos inputs para el panel instalado */
+        .panel-config {
+            background: rgba(255,255,255,0.5);
+            border-radius: 24px;
+            padding: 12px;
+            margin-top: 16px;
+            border: 0.5px solid rgba(0,0,0,0.05);
+        }
+        .panel-config-title {
+            font-size: 0.7rem;
+            font-weight: 600;
+            color: #1e3c72;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .panel-inputs {
+            display: flex;
+            gap: 12px;
+        }
+        .panel-input {
+            flex: 1;
+        }
+        .panel-input label {
+            font-size: 0.6rem;
+            font-weight: 600;
+            color: #5e6f8d;
+            margin-bottom: 4px;
+            display: block;
+        }
+        .panel-input input {
+            width: 100%;
+            padding: 10px 12px;
+            background: rgba(255,255,255,0.9);
+            border: 0.5px solid rgba(0,0,0,0.1);
+            border-radius: 28px;
+            font-size: 0.85rem;
+            font-weight: 500;
+        }
+
+        .btn-primary-glass {
+            background: linear-gradient(135deg, #F97316, #e0670e);
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 32px;
+            font-weight: 600;
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            transition: all 0.2s;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        }
+        .btn-primary-glass:hover {
+            transform: translateY(-1px);
+            filter: brightness(1.02);
+        }
+        .btn-secondary-glass {
+            background: rgba(44,62,102,0.9);
+            backdrop-filter: blur(8px);
+            border: none;
+            width: 100%;
+            padding: 12px;
+            border-radius: 32px;
+            font-weight: 600;
+            color: white;
+            font-size: 0.85rem;
+            cursor: pointer;
+            margin-top: 12px;
+        }
+
+        /* Reloj tipo iOS */
+        .clock-ios {
+            background: rgba(255,255,255,0.5);
+            border-radius: 28px;
+            padding: 16px;
+        }
+        .slider-ios {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+        .slider-ios span:first-child {
+            width: 50px;
+            font-weight: 500;
+            color: #2c3e66;
+        }
+        .slider-ios input {
+            flex: 1;
+            height: 4px;
+            border-radius: 10px;
+            -webkit-appearance: none;
+            background: rgba(0,0,0,0.15);
+        }
+        .slider-ios input::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: #F97316;
+            box-shadow: 0 1px 6px rgba(0,0,0,0.2);
+            cursor: pointer;
+        }
+        .value-ios {
+            width: 38px;
+            text-align: center;
+            font-weight: 600;
+            color: #F97316;
+        }
+        .digital-clock-ios {
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: 600;
+            font-family: monospace;
+            background: rgba(255,255,255,0.7);
+            padding: 10px;
+            border-radius: 40px;
+            margin-top: 8px;
+            letter-spacing: 2px;
+        }
+
+        /* Brújula premium */
+        .compass-glass {
+            background: rgba(255,255,255,0.65);
+            backdrop-filter: blur(20px);
+            border-radius: 36px;
+            margin: 0 24px 24px 24px;
+            padding: 20px;
+            border: 0.5px solid rgba(255,255,255,0.7);
+        }
+        .compass-title {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+        .compass-title h2 {
+            font-size: 1.1rem;
+            font-weight: 600;
+            color: #1e293b;
+        }
+        .compass-wrapper {
+            display: flex;
+            justify-content: center;
+            gap: 28px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+        .compass-outer {
+            position: relative;
+            width: 220px;
+            height: 220px;
+        }
+        .compass-bg {
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            background: rgba(255,255,255,0.8);
+            box-shadow: 0 12px 28px rgba(0,0,0,0.1);
+            border: 1px solid rgba(255,255,255,0.9);
+            position: relative;
+        }
+        .cardinal-pt {
+            position: absolute;
+            font-weight: 700;
+            font-size: 0.85rem;
+        }
+        .n-pt { top: 10px; left: 50%; transform: translateX(-50%); color: #F97316; }
+        .s-pt { bottom: 10px; left: 50%; transform: translateX(-50%); color: #2c3e66; }
+        .e-pt { right: 12px; top: 50%; transform: translateY(-50%); color: #2c3e66; }
+        .w-pt { left: 12px; top: 50%; transform: translateY(-50%); color: #2c3e66; }
+        .inter-card {
+            position: absolute;
+            font-size: 0.6rem;
+            font-weight: 500;
+            color: #7c8ea0;
+        }
+        .ne-pt { top: 32px; right: 32px; }
+        .nw-pt { top: 32px; left: 32px; }
+        .se-pt { bottom: 32px; right: 32px; }
+        .sw-pt { bottom: 32px; left: 32px; }
+
+        .needle-glass {
+            position: absolute;
+            width: 3px;
+            height: 90px;
+            background: #F97316;
+            bottom: 110px;
+            left: 108px;
+            transform-origin: 50% 100%;
+            transition: transform 0.35s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+            border-radius: 6px;
+            z-index: 10;
+        }
+        .needle-glass::after {
+            content: "▲";
+            position: absolute;
+            top: -16px;
+            left: -7px;
+            font-size: 14px;
+            color: #F97316;
+        }
+        .center-dot-glass {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            width: 10px;
+            height: 10px;
+            background: #1e3c72;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .azimut-glass {
+            background: rgba(30,60,114,0.85);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 16px;
+            min-width: 170px;
+            text-align: center;
+            color: white;
+        }
+        .azimut-glass .big-number {
+            font-size: 2.4rem;
+            font-weight: 700;
+            color: #FFB347;
+        }
+
+        /* Resultados grid */
+        .results-grid-glass {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 14px;
+            margin: 0 24px 20px 24px;
+        }
+        @media (max-width: 700px) {
+            .results-grid-glass { grid-template-columns: repeat(2, 1fr); margin: 0 16px 16px 16px; }
+        }
+        .result-glass {
+            background: rgba(255,255,255,0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 12px;
+            text-align: center;
+            border: 0.5px solid rgba(255,255,255,0.5);
+        }
+        .result-glass .label-sm {
+            font-size: 0.6rem;
+            text-transform: uppercase;
+            color: #5e6f8d;
+        }
+        .result-glass .number-lg {
+            font-size: 1.5rem;
+            font-weight: 700;
+            color: #F97316;
+        }
+
+        .efficiency-glass {
+            background: rgba(200,230,201,0.6);
+            backdrop-filter: blur(12px);
+            border-radius: 24px;
+            padding: 14px;
+            margin: 0 24px 24px 24px;
+            text-align: center;
+            font-size: 0.9rem;
+            border-left: 3px solid #4caf50;
+            font-weight: 500;
+        }
+        .night-glass {
+            background: rgba(26,42,58,0.8);
+            backdrop-filter: blur(12px);
+            border-radius: 28px;
+            padding: 16px;
+            margin: 0 24px 24px 24px;
+            text-align: center;
+            color: #ffd966;
+        }
+        footer {
+            text-align: center;
+            padding: 16px;
+            font-size: 0.65rem;
+            color: #6c7e9e;
+            border-top: 0.5px solid rgba(0,0,0,0.05);
+            background: rgba(255,255,255,0.4);
+        }
+        input[type="date"] {
+            cursor: pointer;
+        }
+    </style>
+</head>
+<body>
+<div class="glass-card">
+    <div class="hero-glass">
+        <h1>SolarWise <span class="badge-glass">Eficiencia Real · Panel Instalado</span></h1>
+        <p>Orientación profesional con diseño líquido · Evalúa el rendimiento de tu sistema fotovoltaico existente</p>
+    </div>
+
+    <div class="main-grid">
+        <!-- Mapa + coordenadas -->
+        <div class="glass-panel">
+            <div class="panel-header">📍 Ubicación precisa</div>
+            <div class="panel-body">
+                <div class="map-container" id="map"></div>
+                <div class="map-buttons" style="margin-bottom: 16px;">
+                    <button class="btn-soft" id="centerMapBtn">Centrar</button>
+                    <button class="btn-soft" id="resetMapBtn">Vista global</button>
+                </div>
+                <div class="coord-group">
+                    <div class="coord-input"><label>Latitud</label><input type="number" id="lat" value="18.962172" step="0.0001"></div>
+                    <div class="coord-input"><label>Longitud</label><input type="number" id="lon" value="-98.260361" step="0.0001"></div>
+                </div>
+                <button class="btn-primary-glass" id="btnGps">📍 Usar mi ubicación exacta</button>
+                
+                <!-- NUEVO: Inputs para el panel instalado -->
+                <div class="panel-config">
+                    <div class="panel-config-title">🛠️ Configuración de tu panel instalado</div>
+                    <div class="panel-inputs">
+                        <div class="panel-input">
+                            <label>🧭 Azimut del panel</label>
+                            <input type="number" id="panelAz" value="180" step="1" min="0" max="360">
+                        </div>
+                        <div class="panel-input">
+                            <label>📐 Inclinación del panel</label>
+                            <input type="number" id="panelTilt" value="20" step="1" min="0" max="90">
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Fecha y hora estilo iOS -->
+        <div class="glass-panel">
+            <div class="panel-header">⏰ Fecha y hora</div>
+            <div class="panel-body">
+                <div style="margin-bottom: 16px;">
+                    <label style="font-size:0.7rem; font-weight:600;">📅 Calendario</label>
+                    <input type="date" id="fecha" style="width:100%; padding:12px; border-radius:32px; border:0.5px solid rgba(0,0,0,0.1); background:rgba(255,255,255,0.7); margin-top:6px;">
+                </div>
+                <div class="clock-ios">
+                    <div class="slider-ios"><span>Hora</span><input type="range" id="horaSlider" min="0" max="23" step="1" value="14"><span class="value-ios" id="horaVal">14</span></div>
+                    <div class="slider-ios"><span>Minuto</span><input type="range" id="minSlider" min="0" max="59" step="1" value="55"><span class="value-ios" id="minVal">55</span></div>
+                    <div class="digital-clock-ios" id="clockDisplay">14:55:00</div>
+                </div>
+                <input type="hidden" id="utc" value="-6">
+                <button class="btn-secondary-glass" id="btnAuto">🔄 Actualizar a hora actual</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Brújula premium glassmorphism -->
+    <div class="compass-glass">
+        <div class="compass-title"><h2>🧭 Dirección del Sol y Orientación Óptima</h2><p>Compara con la orientación actual de tu panel</p></div>
+        <div class="compass-wrapper">
+            <div class="compass-outer">
+                <div class="compass-bg">
+                    <div class="cardinal-pt n-pt">N</div><div class="cardinal-pt s-pt">S</div><div class="cardinal-pt e-pt">E</div><div class="cardinal-pt w-pt">O</div>
+                    <div class="inter-card ne-pt">NE</div><div class="inter-card nw-pt">NO</div><div class="inter-card se-pt">SE</div><div class="inter-card sw-pt">SO</div>
+                    <div class="needle-glass" id="needleAz"></div><div class="center-dot-glass"></div>
+                </div>
+            </div>
+            <div class="azimut-glass">
+                <div style="font-size:0.7rem;">ACIMUT DEL SOL</div>
+                <div class="big-number" id="azimutBig">---°</div>
+                <div id="azimutDir" style="font-size:0.75rem;">---</div>
+                <hr style="margin:10px 0; opacity:0.2;">
+                <div style="font-size:0.7rem;">INCLINACIÓN ÓPTIMA</div>
+                <div style="font-size:1.8rem; font-weight:700;" id="tiltBig">---°</div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Resultados actualizados -->
+    <div id="dayResults">
+        <div class="results-grid-glass">
+            <div class="result-glass"><div class="label-sm">☀️ Acimut solar</div><div class="number-lg" id="acimutVal">---°</div><div id="cardinalText" style="font-size:0.65rem;">dirección</div></div>
+            <div class="result-glass"><div class="label-sm">⬆️ Altura solar</div><div class="number-lg" id="alturaVal">---°</div><div style="font-size:0.65rem;">elevación horizonte</div></div>
+            <div class="result-glass"><div class="label-sm">🎯 Orientación panel (real)</div><div class="number-lg" id="orientVal">---°</div><div id="orientCard" style="font-size:0.65rem;">azimut instalado</div></div>
+            <div class="result-glass"><div class="label-sm">📐 Inclinación panel (real)</div><div class="number-lg" id="inclinVal">---°</div><div style="font-size:0.65rem;">ángulo desde suelo</div></div>
+        </div>
+        <div class="efficiency-glass" id="efficiencyMsg">📊 Calculando eficiencia de captación...</div>
+    </div>
+    <div id="nightResults" style="display:none;"><div class="night-glass">🌙 El sol está bajo el horizonte (noche). Los cálculos se actualizarán durante el día.</div></div>
+
+    <footer>Eficiencia calculada mediante ángulo de incidencia · Datos astronómicos precisos · Ajusta el azimut e inclinación de tu panel para simular mejoras</footer>
+</div>
+
+<script>
+    let map, marker;
+    function initMap() {
+        const lat = parseFloat(document.getElementById('lat').value) || 18.962;
+        const lng = parseFloat(document.getElementById('lon').value) || -98.260;
+        map = L.map('map').setView([lat, lng], 13);
+        L.tileLayer('https://{s}.basemaps.cartocdn.com/light_all/{z}/{x}/{y}{r}.png', {
+            attribution: '© OSM & CartoDB',
+            subdomains: 'abcd'
+        }).addTo(map);
+        marker = L.marker([lat, lng], { draggable: true }).addTo(map);
+        marker.on('dragend', () => { const p = marker.getLatLng(); document.getElementById('lat').value = p.lat.toFixed(6); document.getElementById('lon').value = p.lng.toFixed(6); calculateAll(); });
+        map.on('click', (e) => { marker.setLatLng(e.latlng); document.getElementById('lat').value = e.latlng.lat.toFixed(6); document.getElementById('lon').value = e.latlng.lng.toFixed(6); calculateAll(); });
+    }
+    const DEG_TO_RAD = Math.PI/180, RAD_TO_DEG = 180/Math.PI;
+    function getDayOfYear(d) { return Math.floor((new Date(d) - new Date(new Date(d).getFullYear(),0,0))/86400000); }
+    function declinacion(dj) { const rad=(dj-1)*2*Math.PI/365; return RAD_TO_DEG*(0.006918-0.399912*Math.cos(rad)+0.070257*Math.sin(rad)-0.006758*Math.cos(2*rad)+0.000907*Math.sin(2*rad)-0.002697*Math.cos(3*rad)+0.00148*Math.sin(3*rad)); }
+    function ecTiempo(dj) { const B=(dj-1)*2*Math.PI/365; return 229.2*(0.000075+0.001868*Math.cos(B)-0.032077*Math.sin(B)-0.014615*Math.cos(2*B)-0.04089*Math.sin(2*B)); }
+    function solarPos(lat,lon,dj,hLocal,utc){
+        const phi=lat*DEG_TO_RAD, delta=declinacion(dj)*DEG_TO_RAD, Et=ecTiempo(dj);
+        const longHuso=utc*15, correccion=(lon-longHuso)*4;
+        let tSolar=hLocal+(Et+correccion)/60; tSolar=(tSolar%24+24)%24;
+        const H=(tSolar-12)*15*DEG_TO_RAD;
+        const sinAlt=Math.sin(phi)*Math.sin(delta)+Math.cos(phi)*Math.cos(delta)*Math.cos(H);
+        let alt=Math.asin(Math.min(1,Math.max(-1,sinAlt)))*RAD_TO_DEG;
+        let cosAz=(Math.sin(delta)-Math.sin(phi)*sinAlt)/(Math.cos(phi)*Math.cos(Math.asin(sinAlt)));
+        cosAz=Math.min(1,Math.max(-1,cosAz));
+        let az=Math.acos(cosAz)*RAD_TO_DEG;
+        if(Math.sin(H)>0) az=360-az;
+        az=(az+360)%360;
+        if(alt<-0.5) alt=-999;
+        return {altitud:alt, acimut:az};
+    }
+    function cardinal(az){ const p=['N','NE','E','SE','S','SO','O','NO']; return p[Math.round(az/45)%8]; }
+    function updClock(){ let h=parseInt(document.getElementById('horaSlider').value), m=parseInt(document.getElementById('minSlider').value); document.getElementById('horaVal').innerText=h; document.getElementById('minVal').innerText=m.toString().padStart(2,'0'); document.getElementById('clockDisplay').innerHTML=`${h.toString().padStart(2,'0')}:${m.toString().padStart(2,'0')}:00`; }
+    function getDecHour(){ return parseInt(document.getElementById('horaSlider').value)+parseInt(document.getElementById('minSlider').value)/60; }
+    
+    function calculateAll(){
+        try{
+            let lat=parseFloat(document.getElementById('lat').value), lon=parseFloat(document.getElementById('lon').value), fecha=document.getElementById('fecha').value, utc=parseFloat(document.getElementById('utc').value);
+            if(isNaN(utc)) utc=-new Date().getTimezoneOffset()/60;
+            if(isNaN(lat)||isNaN(lon)||!fecha) return;
+            if(marker) marker.setLatLng([lat,lon]);
+            const dj=getDayOfYear(fecha), horaDec=getDecHour(), sun=solarPos(lat,lon,dj,horaDec,utc);
+            const dayDiv=document.getElementById('dayResults'), nightDiv=document.getElementById('nightResults');
+            if(sun.altitud<-0.5){ dayDiv.style.display='none'; nightDiv.style.display='block'; return; }
+            dayDiv.style.display='block'; nightDiv.style.display='none';
+            
+            const az=sun.acimut, alt=sun.altitud, card=cardinal(az);
+            
+            // --- NUEVA LÓGICA: Leer configuración del panel instalado ---
+            let panelAz = parseFloat(document.getElementById('panelAz').value);
+            let panelTilt = parseFloat(document.getElementById('panelTilt').value);
+            if(isNaN(panelAz)) panelAz = 180;
+            if(isNaN(panelTilt)) panelTilt = 20;
+            
+            // --- Cálculo del ángulo de incidencia y eficiencia real usando producto escalar ---
+            // Convertir a radianes
+            const sAz_rad = az * DEG_TO_RAD;
+            const sAlt_rad = alt * DEG_TO_RAD;
+            const pAz_rad = panelAz * DEG_TO_RAD;
+            const pInc_rad = panelTilt * DEG_TO_RAD;
+            
+            // Fórmula del coseno del ángulo de incidencia entre el vector solar y la normal del panel:
+            // cosθ = sin(sAlt) * cos(pInc) + cos(sAlt) * sin(pInc) * cos(sAz - pAz)
+            const cosIncidencia = Math.sin(sAlt_rad) * Math.cos(pInc_rad) + 
+                                 Math.cos(sAlt_rad) * Math.sin(pInc_rad) * Math.cos(sAz_rad - pAz_rad);
+            
+            // La eficiencia es el porcentaje de captación (limitado a valores entre 0 y 100%)
+            let eficienciaPorcentaje = Math.max(0, cosIncidencia) * 100;
+            // Mostrar con 1 decimal para mayor precisión
+            const eficienciaFormateada = eficienciaPorcentaje.toFixed(1);
+            
+            // Determinar mensaje según eficiencia (sugerencias)
+            let mensajeEficiencia = "";
+            if(eficienciaPorcentaje >= 90) mensajeEficiencia = "⭐ ¡Excelente! Orientación e inclinación casi perfectas. Captación óptima.";
+            else if(eficienciaPorcentaje >= 75) mensajeEficiencia = "✅ Muy buena eficiencia. Pequeños ajustes podrían mejorar el rendimiento.";
+            else if(eficienciaPorcentaje >= 50) mensajeEficiencia = "📈 Eficiencia aceptable. Considera ajustar la orientación para ganar más energía.";
+            else if(eficienciaPorcentaje >= 25) mensajeEficiencia = "⚠️ Baja eficiencia. Revisa la orientación del panel con respecto al sol.";
+            else mensajeEficiencia = "🔻 Rendimiento muy bajo. Cambia el azimut e inclinación para captar más radiación.";
+            
+            // Actualizar los valores de la interfaz con los datos del panel real
+            document.getElementById('acimutVal').innerHTML=az.toFixed(1)+"°"; 
+            document.getElementById('alturaVal').innerHTML=alt.toFixed(1)+"°";
+            // Mostrar ahora el Azimut e Inclinación del PANEL (no del sol)
+            document.getElementById('orientVal').innerHTML=panelAz.toFixed(0)+"°"; 
+            document.getElementById('inclinVal').innerHTML=panelTilt.toFixed(1)+"°";
+            document.getElementById('cardinalText').innerHTML=`${card} (${az.toFixed(0)}°)`; 
+            document.getElementById('orientCard').innerHTML=`panel orientado ${cardinal(panelAz)} ${panelAz.toFixed(0)}°`;
+            
+            // Actualizar brújula y datos grandes
+            document.getElementById('azimutBig').innerHTML=az.toFixed(0)+"°"; 
+            document.getElementById('tiltBig').innerHTML=alt.toFixed(1)+"°"; 
+            document.getElementById('azimutDir').innerHTML=`Dirección: ${card}`;
+            document.getElementById('needleAz').style.transform=`rotate(${az}deg)`;
+            
+            // Mostrar el mensaje con la eficiencia real y sugerencia
+            document.getElementById('efficiencyMsg').innerHTML = `📊 <strong>Eficiencia de captación actual: ${eficienciaFormateada}%</strong><br>${mensajeEficiencia}<br><span style="font-size:0.7rem;">🌞 Sol: ${az.toFixed(0)}° ${card} · Altura: ${alt.toFixed(1)}° | Panel: ${panelAz.toFixed(0)}° ${cardinal(panelAz)} · Inclinación: ${panelTilt.toFixed(1)}°</span>`;
+            
+        }catch(e){
+            console.warn(e);
+        }
+    }
+    
+    function setCurrent(){ const n=new Date(); document.getElementById('fecha').value=`${n.getFullYear()}-${String(n.getMonth()+1).padStart(2,'0')}-${String(n.getDate()).padStart(2,'0')}`; document.getElementById('horaSlider').value=n.getHours(); document.getElementById('minSlider').value=n.getMinutes(); updClock(); document.getElementById('utc').value=-n.getTimezoneOffset()/60; calculateAll(); }
+    function getGPS(){ if(navigator.geolocation) navigator.geolocation.getCurrentPosition(p=>{ document.getElementById('lat').value=p.coords.latitude.toFixed(6); document.getElementById('lon').value=p.coords.longitude.toFixed(6); if(marker) marker.setLatLng([p.coords.latitude,p.coords.longitude]); if(map) map.setView([p.coords.latitude,p.coords.longitude],14); calculateAll(); },()=>alert("Error GPS")); else alert("No soportado"); }
+    function centerMap(){ const lat=parseFloat(document.getElementById('lat').value), lon=parseFloat(document.getElementById('lon').value); if(map&&!isNaN(lat)&&!isNaN(lon)) map.setView([lat,lon],14); }
+    function resetMap(){ if(map) map.setView([20,-100],5); }
+    
+    document.getElementById('btnGps').addEventListener('click',getGPS); 
+    document.getElementById('btnAuto').addEventListener('click',setCurrent); 
+    document.getElementById('centerMapBtn').addEventListener('click',centerMap); 
+    document.getElementById('resetMapBtn').addEventListener('click',resetMap);
+    document.getElementById('horaSlider').oninput=()=>{updClock(); calculateAll();}; 
+    document.getElementById('minSlider').oninput=()=>{updClock(); calculateAll();};
+    document.getElementById('lat').oninput=calculateAll; 
+    document.getElementById('lon').oninput=calculateAll; 
+    document.getElementById('fecha').onchange=calculateAll;
+    // Eventos para los nuevos inputs del panel
+    document.getElementById('panelAz').oninput=calculateAll;
+    document.getElementById('panelTilt').oninput=calculateAll;
+    
+    updClock(); setCurrent(); initMap(); setTimeout(calculateAll,500);
+    setInterval(()=>{ let off=-new Date().getTimezoneOffset()/60; document.getElementById('utc').value=off; calculateAll(); },30000);
+</script>
+</body>
+</html>
