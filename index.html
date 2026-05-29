@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
-    <title>SolarWise · Eficiencia Real de Panel Solar | Diseño Apple</title>
+    <title>Solar · Eficiencia Panel Solar</title>
     <!-- Leaflet CSS/JS -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -493,14 +493,14 @@
                 
                 <!-- NUEVO: Inputs para el panel instalado -->
                 <div class="panel-config">
-                    <div class="panel-config-title">🛠️ Configuración de tu panel instalado</div>
+                    <div class="panel-config-title"> Configuración de tu panel instalado</div>
                     <div class="panel-inputs">
                         <div class="panel-input">
                             <label> Azimut del panel</label>
                             <input type="number" id="panelAz" value="180" step="1" min="0" max="360">
                         </div>
                         <div class="panel-input">
-                            <label>📐 Inclinación del panel</label>
+                            <label> Inclinación del panel</label>
                             <input type="number" id="panelTilt" value="20" step="1" min="0" max="90">
                         </div>
                     </div>
@@ -513,7 +513,7 @@
             <div class="panel-header"> Fecha y hora</div>
             <div class="panel-body">
                 <div style="margin-bottom: 16px;">
-                    <label style="font-size:0.7rem; font-weight:600;">📅 Calendario</label>
+                    <label style="font-size:0.7rem; font-weight:600;"> Calendario</label>
                     <input type="date" id="fecha" style="width:100%; padding:12px; border-radius:32px; border:0.5px solid rgba(0,0,0,0.1); background:rgba(255,255,255,0.7); margin-top:6px;">
                 </div>
                 <div class="clock-ios">
@@ -522,7 +522,7 @@
                     <div class="digital-clock-ios" id="clockDisplay">14:55:00</div>
                 </div>
                 <input type="hidden" id="utc" value="-6">
-                <button class="btn-secondary-glass" id="btnAuto">🔄 Actualizar a hora actual</button>
+                <button class="btn-secondary-glass" id="btnAuto"> Actualizar a hora actual</button>
             </div>
         </div>
     </div>
@@ -557,9 +557,9 @@
             <div class="result-glass"><div class="label-sm"> Orientación panel (real)</div><div class="number-lg" id="orientVal">---°</div><div id="orientCard" style="font-size:0.65rem;">azimut instalado</div></div>
             <div class="result-glass"><div class="label-sm"> Inclinación panel (real)</div><div class="number-lg" id="inclinVal">---°</div><div style="font-size:0.65rem;">ángulo desde suelo</div></div>
         </div>
-        <div class="efficiency-glass" id="efficiencyMsg">📊 Calculando eficiencia de captación...</div>
+        <div class="efficiency-glass" id="efficiencyMsg"> Calculando eficiencia de captación...</div>
     </div>
-    <div id="nightResults" style="display:none;"><div class="night-glass">🌙 El sol está bajo el horizonte (noche). Los cálculos se actualizarán durante el día.</div></div>
+    <div id="nightResults" style="display:none;"><div class="night-glass"> El sol está bajo el horizonte (noche). Los cálculos se actualizarán durante el día.</div></div>
 
     <footer>Eficiencia calculada mediante ángulo de incidencia · Datos astronómicos precisos · Ajusta el azimut e inclinación de tu panel para simular mejoras</footer>
 </div>
@@ -643,7 +643,7 @@
             else if(eficienciaPorcentaje >= 75) mensajeEficiencia = " Muy buena eficiencia. Pequeños ajustes podrían mejorar el rendimiento.";
             else if(eficienciaPorcentaje >= 50) mensajeEficiencia = " Eficiencia aceptable. Considera ajustar la orientación para ganar más energía.";
             else if(eficienciaPorcentaje >= 25) mensajeEficiencia = " Baja eficiencia. Revisa la orientación del panel con respecto al sol.";
-            else mensajeEficiencia = "🔻 Rendimiento muy bajo. Cambia el azimut e inclinación para captar más radiación.";
+            else mensajeEficiencia = " Rendimiento muy bajo. Cambia el azimut e inclinación para captar más radiación.";
             
             // Actualizar los valores de la interfaz con los datos del panel real
             document.getElementById('acimutVal').innerHTML=az.toFixed(1)+"°"; 
@@ -661,7 +661,7 @@
             document.getElementById('needleAz').style.transform=`rotate(${az}deg)`;
             
             // Mostrar el mensaje con la eficiencia real y sugerencia
-            document.getElementById('efficiencyMsg').innerHTML = `📊 <strong>Eficiencia de captación actual: ${eficienciaFormateada}%</strong><br>${mensajeEficiencia}<br><span style="font-size:0.7rem;">🌞 Sol: ${az.toFixed(0)}° ${card} · Altura: ${alt.toFixed(1)}° | Panel: ${panelAz.toFixed(0)}° ${cardinal(panelAz)} · Inclinación: ${panelTilt.toFixed(1)}°</span>`;
+            document.getElementById('efficiencyMsg').innerHTML = ` <strong>Eficiencia de captación actual: ${eficienciaFormateada}%</strong><br>${mensajeEficiencia}<br><span style="font-size:0.7rem;">🌞 Sol: ${az.toFixed(0)}° ${card} · Altura: ${alt.toFixed(1)}° | Panel: ${panelAz.toFixed(0)}° ${cardinal(panelAz)} · Inclinación: ${panelTilt.toFixed(1)}°</span>`;
             
         }catch(e){
             console.warn(e);
