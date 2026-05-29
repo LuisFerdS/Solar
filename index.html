@@ -478,7 +478,7 @@
     <div class="main-grid">
         <!-- Mapa + coordenadas -->
         <div class="glass-panel">
-            <div class="panel-header">📍 Ubicación precisa</div>
+            <div class="panel-header"> Ubicación precisa</div>
             <div class="panel-body">
                 <div class="map-container" id="map"></div>
                 <div class="map-buttons" style="margin-bottom: 16px;">
@@ -489,14 +489,14 @@
                     <div class="coord-input"><label>Latitud</label><input type="number" id="lat" value="18.962172" step="0.0001"></div>
                     <div class="coord-input"><label>Longitud</label><input type="number" id="lon" value="-98.260361" step="0.0001"></div>
                 </div>
-                <button class="btn-primary-glass" id="btnGps">📍 Usar mi ubicación exacta</button>
+                <button class="btn-primary-glass" id="btnGps"> Usar mi ubicación exacta</button>
                 
                 <!-- NUEVO: Inputs para el panel instalado -->
                 <div class="panel-config">
                     <div class="panel-config-title">🛠️ Configuración de tu panel instalado</div>
                     <div class="panel-inputs">
                         <div class="panel-input">
-                            <label>🧭 Azimut del panel</label>
+                            <label> Azimut del panel</label>
                             <input type="number" id="panelAz" value="180" step="1" min="0" max="360">
                         </div>
                         <div class="panel-input">
@@ -510,7 +510,7 @@
 
         <!-- Fecha y hora estilo iOS -->
         <div class="glass-panel">
-            <div class="panel-header">⏰ Fecha y hora</div>
+            <div class="panel-header"> Fecha y hora</div>
             <div class="panel-body">
                 <div style="margin-bottom: 16px;">
                     <label style="font-size:0.7rem; font-weight:600;">📅 Calendario</label>
@@ -529,7 +529,7 @@
 
     <!-- Brújula premium glassmorphism -->
     <div class="compass-glass">
-        <div class="compass-title"><h2>🧭 Dirección del Sol y Orientación Óptima</h2><p>Compara con la orientación actual de tu panel</p></div>
+        <div class="compass-title"><h2> Dirección del Sol y Orientación Óptima</h2><p>Compara con la orientación actual de tu panel</p></div>
         <div class="compass-wrapper">
             <div class="compass-outer">
                 <div class="compass-bg">
@@ -552,10 +552,10 @@
     <!-- Resultados actualizados -->
     <div id="dayResults">
         <div class="results-grid-glass">
-            <div class="result-glass"><div class="label-sm">☀️ Acimut solar</div><div class="number-lg" id="acimutVal">---°</div><div id="cardinalText" style="font-size:0.65rem;">dirección</div></div>
-            <div class="result-glass"><div class="label-sm">⬆️ Altura solar</div><div class="number-lg" id="alturaVal">---°</div><div style="font-size:0.65rem;">elevación horizonte</div></div>
-            <div class="result-glass"><div class="label-sm">🎯 Orientación panel (real)</div><div class="number-lg" id="orientVal">---°</div><div id="orientCard" style="font-size:0.65rem;">azimut instalado</div></div>
-            <div class="result-glass"><div class="label-sm">📐 Inclinación panel (real)</div><div class="number-lg" id="inclinVal">---°</div><div style="font-size:0.65rem;">ángulo desde suelo</div></div>
+            <div class="result-glass"><div class="label-sm"> Acimut solar</div><div class="number-lg" id="acimutVal">---°</div><div id="cardinalText" style="font-size:0.65rem;">dirección</div></div>
+            <div class="result-glass"><div class="label-sm"> Altura solar</div><div class="number-lg" id="alturaVal">---°</div><div style="font-size:0.65rem;">elevación horizonte</div></div>
+            <div class="result-glass"><div class="label-sm"> Orientación panel (real)</div><div class="number-lg" id="orientVal">---°</div><div id="orientCard" style="font-size:0.65rem;">azimut instalado</div></div>
+            <div class="result-glass"><div class="label-sm"> Inclinación panel (real)</div><div class="number-lg" id="inclinVal">---°</div><div style="font-size:0.65rem;">ángulo desde suelo</div></div>
         </div>
         <div class="efficiency-glass" id="efficiencyMsg">📊 Calculando eficiencia de captación...</div>
     </div>
@@ -639,10 +639,10 @@
             
             // Determinar mensaje según eficiencia (sugerencias)
             let mensajeEficiencia = "";
-            if(eficienciaPorcentaje >= 90) mensajeEficiencia = "⭐ ¡Excelente! Orientación e inclinación casi perfectas. Captación óptima.";
-            else if(eficienciaPorcentaje >= 75) mensajeEficiencia = "✅ Muy buena eficiencia. Pequeños ajustes podrían mejorar el rendimiento.";
-            else if(eficienciaPorcentaje >= 50) mensajeEficiencia = "📈 Eficiencia aceptable. Considera ajustar la orientación para ganar más energía.";
-            else if(eficienciaPorcentaje >= 25) mensajeEficiencia = "⚠️ Baja eficiencia. Revisa la orientación del panel con respecto al sol.";
+            if(eficienciaPorcentaje >= 90) mensajeEficiencia = " ¡Excelente! Orientación e inclinación casi perfectas. Captación óptima.";
+            else if(eficienciaPorcentaje >= 75) mensajeEficiencia = " Muy buena eficiencia. Pequeños ajustes podrían mejorar el rendimiento.";
+            else if(eficienciaPorcentaje >= 50) mensajeEficiencia = " Eficiencia aceptable. Considera ajustar la orientación para ganar más energía.";
+            else if(eficienciaPorcentaje >= 25) mensajeEficiencia = " Baja eficiencia. Revisa la orientación del panel con respecto al sol.";
             else mensajeEficiencia = "🔻 Rendimiento muy bajo. Cambia el azimut e inclinación para captar más radiación.";
             
             // Actualizar los valores de la interfaz con los datos del panel real
